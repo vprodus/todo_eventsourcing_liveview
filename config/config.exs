@@ -25,6 +25,16 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+config :todo_backend, TodoBackend.App,
+  event_store: [
+    adapter: Commanded.EventStore.Adapters.EventStore,
+    event_store: TodoBackend.EventStore
+  ],
+  pubsub: :local,
+  registry: :local
+
+config :todo_backend, event_stores: [TodoBackend.EventStore]
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
