@@ -17,7 +17,7 @@ defmodule TodoBackendWeb.TodoJSON do
 
   defp data(%Todo{} = todo) do
     %{
-      id: todo.id,
+      id: todo.uuid,
       title: todo.title,
       completed: todo.completed,
       order: todo.order,

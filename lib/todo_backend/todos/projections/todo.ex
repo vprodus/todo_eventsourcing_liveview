@@ -1,7 +1,9 @@
-defmodule TodoBackend.Todos.Todo do
+defmodule TodoBackend.Todos.Projections.Todo do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @primary_key {:uuid, :binary_id, autogenerate: false}
+  @derive {Phoenix.Param, key: :uuid}
   schema "todos" do
     field :title, :string
     field :completed, :boolean, default: false
@@ -11,9 +13,8 @@ defmodule TodoBackend.Todos.Todo do
   end
 
   @doc false
-  def changeset(todo, attrs) do
+  def update_changeset(todo, attrs \\ %{}) do
     todo
     |> cast(attrs, [:title, :completed, :order])
-    |> validate_required([:title, :completed])
   end
 end
