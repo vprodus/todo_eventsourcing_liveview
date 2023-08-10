@@ -1,5 +1,5 @@
 defmodule TodoBackendWeb.TodoJSON do
-  alias TodoBackend.Todos.Todo
+  alias TodoBackend.Todos.Projections.Todo
 
   @doc """
   Renders a list of todos.
