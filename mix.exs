@@ -42,7 +42,8 @@ defmodule TodoBackend.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:commanded, "~> 1.4"},
       {:commanded_eventstore_adapter, "~> 1.4"},
-      {:cors_plug, "~> 3.0"}
+      {:cors_plug, "~> 3.0"},
+      {:commanded_ecto_projections, "~> 1.3"}
     ]
   end
 
