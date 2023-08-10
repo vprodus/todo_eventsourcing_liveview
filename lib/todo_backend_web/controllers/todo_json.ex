@@ -21,7 +21,7 @@ defmodule TodoBackendWeb.TodoJSON do
       title: todo.title,
       completed: todo.completed,
       order: todo.order,
-      url: Routes.todo_url(Endpoint, :show, todo.id)
+      # url: Routes.todo_url(Endpoint, :show, todo.id)
     }
   end
 end
