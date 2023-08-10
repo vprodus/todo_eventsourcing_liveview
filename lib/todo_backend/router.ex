@@ -3,7 +3,9 @@ defmodule TodoBackend.Router do
 
   alias TodoBackend.Todos.Aggregates.Todo
   alias TodoBackend.Todos.Commands.CreateTodo
+  alias TodoBackend.Todos.Commands.UpdateTodo
 
   dispatch([CreateTodo], to: Todo, identity: :uuid)
   dispatch([DeleteTodo], to: Todo, identity: :uuid)
+  dispatch([UpdateTodo], to: Todo, identity: :uuid)
 end
