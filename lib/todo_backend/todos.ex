@@ -19,7 +19,11 @@ defmodule TodoBackend.Todos do
 
   """
   def list_todos do
-    Repo.all(Todo)
+    # Repo.all(Todo)
+    from(t in Todo,
+      where: is_nil(t.deleted_at)
+    )
+    |> Repo.all()
   end
 
   @doc """
@@ -36,7 +40,13 @@ defmodule TodoBackend.Todos do
       ** (Ecto.NoResultsError)
 
   """
-  def get_todo!(uuid), do: Repo.get!(Todo, uuid: uuid)
+  # def get_todo!(uuid), do: Repo.get!(Todo, uuid: uuid)
+  def get_todo!(uuid) do
+    from(t in Todo,
+      where: is_nil(t.deleted_at)
+    )
+    |> Repo.get_by!(uuid: uuid)
+  end
 
   @doc """
   Creates a todo.
@@ -129,6 +139,17 @@ defmodule TodoBackend.Todos do
 
   """
   def delete_all_todos() do
-    Repo.delete_all(Todo)
+    # Repo.delete_all(Todo)
+    stream = Repo.stream(Todo)
+    correlation_id = Ecto.UUID.generate()
+
+    Repo.transaction(fn ->
+      Enum.each(stream, fn todo ->
+        App.dispatch(
+          DeleteTodo.new(%{uuid: todo.uuid}),
+          correlation_id: correlation_id
+        )
+      end)
+    end)
   end
 end

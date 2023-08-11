@@ -3,7 +3,8 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
     :uuid,
     :title,
     :completed,
-    :order
+    :order,
+    deleted_at: nil
   ]
 
   @behaviour Commanded.Aggregates.AggregateLifespan
@@ -31,7 +32,7 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
   end
 
   def execute(%Todo{uuid: uuid}, %DeleteTodo{uuid: uuid}) do
-    %TodoDeleted{uuid: uuid}
+    %TodoDeleted{uuid: uuid, datetime: DateTime.utc_now()}
   end
 
   # TODO: validate
@@ -68,8 +69,8 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
     }
   end
 
-  def apply(%Todo{uuid: uuid}, %TodoDeleted{uuid: uuid}) do
-    nil
+  def apply(%Todo{uuid: uuid} = todo, %TodoDeleted{uuid: uuid, datetime: effective_datetime}) do
+    %Todo{todo | deleted_at: effective_datetime}
   end
 
   def apply(%Todo{} = todo, %TodoCompleted{}) do
