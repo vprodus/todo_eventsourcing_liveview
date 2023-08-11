@@ -43,7 +43,8 @@ defmodule TodoBackend.MixProject do
       {:commanded, "~> 1.4"},
       {:commanded_eventstore_adapter, "~> 1.4"},
       {:cors_plug, "~> 3.0"},
-      {:commanded_ecto_projections, "~> 1.3"}
+      {:commanded_ecto_projections, "~> 1.3"},
+      {:exconstructor, "~> 1.2"}
     ]
   end
 
