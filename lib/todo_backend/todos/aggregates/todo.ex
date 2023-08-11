@@ -6,6 +6,8 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
     :order
   ]
 
+  @behaviour Commanded.Aggregates.AggregateLifespan
+
   alias TodoBackend.Todos.Aggregates.Todo
 
   alias TodoBackend.Todos.Commands.CreateTodo
@@ -85,4 +87,11 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
   def apply(%Todo{} = todo, %TodoOrderUpdated{order: order}) do
     %Todo{todo | order: order}
   end
+
+  def after_command(_command), do: :timer.minutes(1)
+
+  def after_event(%TodoDeleted{}), do: :stop
+  def after_event(_event), do: :timer.minutes(1)
+
+  def after_error(_error), do: :timer.minutes(1)
 end
