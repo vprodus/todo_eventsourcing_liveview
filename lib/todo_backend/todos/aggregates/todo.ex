@@ -10,17 +10,9 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
   @behaviour Commanded.Aggregates.AggregateLifespan
 
   alias TodoBackend.Todos.Aggregates.Todo
+  alias TodoBackend.Todos.Commands.{CreateTodo, DeleteTodo, UpdateTodo, RestoreTodo}
+  alias TodoBackend.Todos.Events.{TodoCreated, TodoDeleted, TodoCompleted, TodoUncompleted, TodoTitleUpdated, TodoOrderUpdated, TodoRestored}
 
-  alias TodoBackend.Todos.Commands.CreateTodo
-  alias TodoBackend.Todos.Commands.DeleteTodo
-  alias TodoBackend.Todos.Commands.UpdateTodo
-
-  alias TodoBackend.Todos.Events.TodoCreated
-  alias TodoBackend.Todos.Events.TodoDeleted
-  alias TodoBackend.Todos.Events.TodoCompleted
-  alias TodoBackend.Todos.Events.TodoUncompleted
-  alias TodoBackend.Todos.Events.TodoTitleUpdated
-  alias TodoBackend.Todos.Events.TodoOrderUpdated
 
   def execute(%Todo{uuid: nil}, %CreateTodo{} = create) do
     %TodoCreated{
@@ -31,8 +23,12 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
     }
   end
 
-  def execute(%Todo{uuid: uuid}, %DeleteTodo{uuid: uuid}) do
+  def execute(%Todo{uuid: uuid, deleted_at: nil}, %DeleteTodo{uuid: uuid}) do
     %TodoDeleted{uuid: uuid, datetime: DateTime.utc_now()}
+  end
+
+  def execute(%Todo{}, %DeleteTodo{}) do
+    {:error, "Can not delete todo that is already deleted"}
   end
 
   # TODO: validate
@@ -55,6 +51,14 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
         do: %TodoOrderUpdated{uuid: todo.uuid, order: update.order}
 
     [completion_command, title_command, order_command] |> Enum.filter(&Function.identity/1)
+  end
+
+  def execute(%Todo{deleted_at: nil}, %RestoreTodo{}) do
+    {:error, "Can only restore deleted todos"}
+  end
+
+  def execute(%Todo{uuid: uuid}, %RestoreTodo{uuid: uuid}) do
+    %TodoRestored{uuid: uuid}
   end
 
 
@@ -87,6 +91,10 @@ defmodule TodoBackend.Todos.Aggregates.Todo do
 
   def apply(%Todo{} = todo, %TodoOrderUpdated{order: order}) do
     %Todo{todo | order: order}
+  end
+
+  def apply(%Todo{uuid: uuid} = todo, %TodoRestored{uuid: uuid}) do
+    %Todo{todo | deleted_at: nil}
   end
 
   def after_command(_command), do: :timer.minutes(1)

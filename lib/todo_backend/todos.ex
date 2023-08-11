@@ -6,7 +6,7 @@ defmodule TodoBackend.Todos do
   import Ecto.Query, warn: false
   alias TodoBackend.Repo
   alias TodoBackend.App
-  alias TodoBackend.Todos.Commands.{CreateTodo, DeleteTodo, UpdateTodo}
+  alias TodoBackend.Todos.Commands.{CreateTodo, DeleteTodo, UpdateTodo, RestoreTodo}
   alias TodoBackend.Todos.Projections.Todo
 
   @doc """
@@ -124,6 +124,16 @@ defmodule TodoBackend.Todos do
 
     with :ok <- App.dispatch(command) do
       :ok
+    else
+      reply -> reply
+    end
+  end
+
+  def restore_todo(id) do
+    command = %RestoreTodo{uuid: id}
+
+    with :ok <- App.dispatch(command, consistency: :strong) do
+      {:ok, get_todo!(id)}
     else
       reply -> reply
     end
